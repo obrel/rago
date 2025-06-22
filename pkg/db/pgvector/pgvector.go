@@ -99,7 +99,7 @@ func (p *PGVector) UpdateDocument(ctx context.Context, content string, embedding
 }
 
 func (p *PGVector) DeleteEmbeddings(ctx context.Context, docID string) error {
-	query := `DELETE openai_embeddings WHERE doc_id = $1`
+	query := `DELETE FROM openai_embeddings WHERE doc_id = $1`
 
 	_, err := p.conn.Exec(ctx, query, docID)
 	if err != nil {
