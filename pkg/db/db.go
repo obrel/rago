@@ -25,6 +25,8 @@ type DB interface {
 	SaveEmbeddings(ctx context.Context, docID string, embedding []float32, metadata map[string]interface{}) error
 	QueryRelevantDocuments(ctx context.Context, embedding []float32) ([]Document, error)
 	FindByDocID(ctx context.Context, docID string) (Document, error)
+	UpdateDocument(ctx context.Context, content string, embedding []float32) (string, error)
+	DeleteEmbeddings(ctx context.Context, docID string) error
 	Close()
 }
 

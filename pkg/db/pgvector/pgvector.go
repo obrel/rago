@@ -23,7 +23,7 @@ func (p *PGVector) InsertDocument(ctx context.Context, content string, embedding
 
 	err := p.SaveEmbeddings(ctx, docID, embedding, metadata)
 	if err != nil {
-		return "", fmt.Errorf("Error saving embedding: %v.", err)
+		return "", err
 	}
 
 	return docID, nil
@@ -77,6 +77,36 @@ func (p *PGVector) FindByDocID(ctx context.Context, docID string) (db.Document, 
 	}
 
 	return doc, nil
+}
+
+func (p *PGVector) UpdateDocument(ctx context.Context, content string, embedding []float32) (string, error) {
+	docID := uuid.New().String()
+	metadata := map[string]interface{}{
+		"content": content,
+	}
+
+	err := p.DeleteEmbeddings(ctx, docID)
+	if err != nil {
+		return "", err
+	}
+
+	err = p.SaveEmbeddings(ctx, docID, embedding, metadata)
+	if err != nil {
+		return "", err
+	}
+
+	return docID, nil
+}
+
+func (p *PGVector) DeleteEmbeddings(ctx context.Context, docID string) error {
+	query := `DELETE openai_embeddings WHERE doc_id = $1`
+
+	_, err := p.conn.Exec(ctx, query, docID)
+	if err != nil {
+		return fmt.Errorf("Failed to delete document: %v.", err)
+	}
+
+	return nil
 }
 
 func (p *PGVector) Close() {
