@@ -79,8 +79,7 @@ func (p *PGVector) FindByDocID(ctx context.Context, docID string) (db.Document, 
 	return doc, nil
 }
 
-func (p *PGVector) UpdateDocument(ctx context.Context, content string, embedding []float32) (string, error) {
-	docID := uuid.New().String()
+func (p *PGVector) UpdateDocument(ctx context.Context, docID, content string, embedding []float32) (string, error) {
 	metadata := map[string]interface{}{
 		"content": content,
 	}
