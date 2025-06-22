@@ -89,6 +89,12 @@ func DSN(s string) db.Option {
 	}
 }
 
+func PGXPool(p *pgxpool.Pool) db.Option {
+	return func(d *PGVector) {
+		d.conn = p
+	}
+}
+
 func init() {
 	db.Register("pgvector", func(opts ...db.Option) (db.DB, error) {
 		d := &PGVector{}
@@ -102,12 +108,17 @@ func init() {
 			}
 		}
 
-		pool, err := pgxpool.Connect(context.Background(), d.dsn)
-		if err != nil {
-			return nil, fmt.Errorf("Failed to connect to database: %v.", err)
+		if d.dsn != "" {
+			pool, err := pgxpool.Connect(context.Background(), d.dsn)
+			if err != nil {
+				return nil, fmt.Errorf("Failed to connect to database: %v.", err)
+			}
+
+			d.conn = pool
+		} else if d.conn == nil {
+			return nil, fmt.Errorf("Database connection not found.")
 		}
 
-		d.conn = pool
 		return d, nil
 	})
 }
